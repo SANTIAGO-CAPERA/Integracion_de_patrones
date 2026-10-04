@@ -1,10 +1,22 @@
 package mediator;
 
+import bridge.Documento;
+import bridge.DocumentoContinuo;
+import bridge.DocumentoPaginado;
+import bridge.HtmlRenderEngine;
+import bridge.MarkdownRenderEngine;
+import bridge.PdfRenderEngine;
+import bridge.RenderizadorEngine;
 import builder.DirectorDocumento;
 import builder.DocumentBuilder;
 import builder.EstructuraDocumento;
+import builder.FacturaSimpleBuilder;
+import builder.ReporteEjecutivoBuilder;
+import chain.DocumentoEnProceso;
 
 public class PanelControlMediator implements DocumentEditorMediator {
+    private static final int ELEMENTOS_POR_PAGINA = 2;
+
     private final SelectorDeFormato selectorDeFormato;
     private final BarraDeHerramientasBuilder barraDeHerramientasBuilder;
     private final VistaPrevia vistaPrevia;
@@ -13,10 +25,10 @@ public class PanelControlMediator implements DocumentEditorMediator {
     private final DirectorDocumento director = new DirectorDocumento();
     private DocumentBuilder builderActual;
     private String tipoActual;
-    private EstructuraDocumento documentoActual;
 
-    // Se necesita implementacion de Bridge
-    private String motorActual;
+    private RenderizadorEngine motorActual;
+    private Documento documentoActual;
+    private String ultimaSalida;
 
     public PanelControlMediator(SelectorDeFormato selectorDeFormato, BarraDeHerramientasBuilder barraDeHerramientasBuilder, VistaPrevia vistaPrevia, BotonExportar botonExportar) {
         this.selectorDeFormato = selectorDeFormato;
@@ -32,10 +44,8 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     public void notificar(ComponenteUI emisor, String evento) {
         System.out.println("   [Mediator] " + emisor.getNombre() + " -> " + evento);
-
         if (FORMATO_CAMBIADO.equals(evento)) {
-            motorActual = selectorDeFormato.getFormato();
-            // Se necesita la integracion Bridge: motorActual
+            motorActual = crearMotor(selectorDeFormato.getFormato());
             actualizarPanel();
         } else if (TIPO_DOCUMENTO_CAMBIADO.equals(evento)) {
             tipoActual = barraDeHerramientasBuilder.getTipoDocumento();
@@ -48,30 +58,58 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     private DocumentBuilder crearBuilder(String tipo) {
         if (BarraDeHerramientasBuilder.REPORTE_EJECUTIVO.equals(tipo)) {
-            return new builder.ReporteEjecutivoBuilder();
+            return new ReporteEjecutivoBuilder();
         }
         if (BarraDeHerramientasBuilder.FACTURA_SIMPLE.equals(tipo)) {
-            return new builder.FacturaSimpleBuilder();
+            return new FacturaSimpleBuilder();
         }
         throw new IllegalArgumentException("Tipo de documento sin builder asociado: " + tipo);
     }
 
+    private RenderizadorEngine crearMotor(String formato) {
+        if (SelectorDeFormato.PDF.equals(formato)) {
+            return new PdfRenderEngine();
+        }
+        if (SelectorDeFormato.HTML.equals(formato)) {
+            return new HtmlRenderEngine();
+        }
+        if (SelectorDeFormato.MARKDOWN.equals(formato)) {
+            return new MarkdownRenderEngine();
+        }
+        throw new IllegalArgumentException("Formato sin motor de render asociado: " + formato);
+    }
+
     private void actualizarPanel() {
-        vistaPrevia.refrescar(builderActual, motorActual);
+        String formato = motorActual == null ? null : motorActual.getNombre();
+        vistaPrevia.refrescar(tipoActual, formato);
         botonExportar.setHabilitado(builderActual != null && motorActual != null);
     }
 
     private void exportar() {
-        documentoActual = construirDocumento();
-        System.out.println("   [Mediator] Exportando con builder=" + documentoActual.getTitulo() + " (" + documentoActual.cantidadElementos() + " elementos), motor=" + motorActual);
-        // Integracion Bridge
+        EstructuraDocumento estructura = construirEstructura();
+        // Se necesita la integracion Chain: pasar el DocumentoEnProceso por la cadena de procesadores antes de renderizar.
+        DocumentoEnProceso contenido = new DocumentoEnProceso(estructura);
+
+        documentoActual = crearDocumento(contenido);
+        ultimaSalida = documentoActual.renderizar();
+
+        System.out.println("   [Mediator] " + estructura.getTitulo() + " renderizado con " + motorActual.getNombre()
+                + " (" + documentoActual.getClass().getSimpleName() + "):");
+        System.out.println(ultimaSalida);
     }
 
-    private EstructuraDocumento construirDocumento() {
+    private EstructuraDocumento construirEstructura() {
         if (BarraDeHerramientasBuilder.REPORTE_EJECUTIVO.equals(tipoActual)) {
             return director.construirReporteEjecutivo(builderActual);
         }
         return director.construirFacturaSimple(builderActual);
+    }
+
+    private Documento crearDocumento(DocumentoEnProceso contenido) {
+        if (SelectorDeFormato.PDF.equals(motorActual.getNombre())) {
+            return new DocumentoPaginado(contenido, motorActual, ELEMENTOS_POR_PAGINA);
+        }
+        return new DocumentoContinuo(contenido, motorActual);
     }
 
     public DocumentBuilder getBuilderActual() {
@@ -82,11 +120,15 @@ public class PanelControlMediator implements DocumentEditorMediator {
         return tipoActual;
     }
 
-    public EstructuraDocumento getDocumentoActual() {
+    public RenderizadorEngine getMotorActual() {
+        return motorActual;
+    }
+
+    public Documento getDocumentoActual() {
         return documentoActual;
     }
 
-    public String getMotorActual() {
-        return motorActual;
+    public String getUltimaSalida() {
+        return ultimaSalida;
     }
 }

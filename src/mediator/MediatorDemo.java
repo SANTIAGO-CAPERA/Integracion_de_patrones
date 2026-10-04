@@ -31,7 +31,13 @@ public class MediatorDemo {
         boton.presionar();
 
         System.out.println();
-        System.out.println("Tipo de documeto final: " + panel.getTipoActual());
-        System.out.println("Motor final: " + panel.getMotorActual());
+        System.out.println("--- 6. Cambiar a reporte ejecutivo en Markdown y exportar ---");
+        barra.seleccionarTipo(BarraDeHerramientasBuilder.REPORTE_EJECUTIVO);
+        selector.seleccionarFormato(SelectorDeFormato.MARKDOWN);
+        boton.presionar();
+
+        System.out.println();
+        System.out.println("Tipo de documento final: " + panel.getTipoActual());
+        System.out.println("Motor final: " + panel.getMotorActual().getNombre());
     }
 }
