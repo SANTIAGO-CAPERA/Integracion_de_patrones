@@ -13,12 +13,13 @@ public class Context {
     public Context() {
         // Predefined variable
         variables.put("CURRENT_DATE", LocalDate.now());
+        variables.put("FECHA_ACTUAL", LocalDate.now());
     }
 
     // ─── Writing ───
     public Context define(String name, Object value) {
         // Numbers are saved as BigDecimals to avoid precision issues
-        if (value instanceof Number) {
+        if (value instanceof java.lang.Number) {
             value = new BigDecimal(value.toString());
         }
         variables.put(name, value);
