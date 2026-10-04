@@ -1,9 +1,9 @@
 package mediator;
 
 public class SelectorDeFormato extends ComponenteUI{
-    private static final String PDF = "PDF";
-    private static final String HTML = "HTML";
-    private static final String MARKDOWN = "MARKDOWN";
+    public static final String PDF = "PDF";
+    public static final String HTML = "HTML";
+    public static final String MARKDOWN = "MARKDOWN";
 
     private String formato;
 

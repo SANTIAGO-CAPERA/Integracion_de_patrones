@@ -1,5 +1,4 @@
 package mediator;
-import mediator.SelectorDeFormato;
 
 public class MediatorDemo {
 
@@ -20,7 +19,7 @@ public class MediatorDemo {
 
         System.out.println();
         System.out.println("--- 3. Elegir formato PDF ---");
-        selector.seleccionar(SelectorDeFormato.PDF);
+        selector.seleccionarFormato(SelectorDeFormato.PDF);
 
         System.out.println();
         System.out.println("--- 4. Exportar ---");
@@ -28,11 +27,11 @@ public class MediatorDemo {
 
         System.out.println();
         System.out.println("--- 5. Cambiar formato a HTML y exportar ---");
-        selector.seleccionar(SelectorDeFormato.HTML);
+        selector.seleccionarFormato(SelectorDeFormato.HTML);
         boton.presionar();
 
         System.out.println();
-        System.out.println("Builder final: " + panel.getBuilderActual());
+        System.out.println("Tipo de documeto final: " + panel.getTipoActual());
         System.out.println("Motor final: " + panel.getMotorActual());
     }
 }

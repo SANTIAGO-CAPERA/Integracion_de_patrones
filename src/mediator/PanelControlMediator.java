@@ -1,13 +1,21 @@
 package mediator;
 
+import builder.DirectorDocumento;
+import builder.DocumentBuilder;
+import builder.EstructuraDocumento;
+
 public class PanelControlMediator implements DocumentEditorMediator {
     private final SelectorDeFormato selectorDeFormato;
     private final BarraDeHerramientasBuilder barraDeHerramientasBuilder;
     private final VistaPrevia vistaPrevia;
     private final BotonExportar botonExportar;
 
-    // Se necesitan las clases DocumentBuilder y RenderEngine para poder construir y renderizar el documento final.
-    private String builderActual;
+    private final DirectorDocumento director = new DirectorDocumento();
+    private DocumentBuilder builderActual;
+    private String tipoActual;
+    private EstructuraDocumento documentoActual;
+
+    // Se necesita implementacion de Bridge
     private String motorActual;
 
     public PanelControlMediator(SelectorDeFormato selectorDeFormato, BarraDeHerramientasBuilder barraDeHerramientasBuilder, VistaPrevia vistaPrevia, BotonExportar botonExportar) {
@@ -27,15 +35,25 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
         if (FORMATO_CAMBIADO.equals(evento)) {
             motorActual = selectorDeFormato.getFormato();
-            // Se necesita la integracion Bridge: motorActual = crear PdfRenderEngine / HtmlRenderEngine / MarkdownRenderEngine
+            // Se necesita la integracion Bridge: motorActual
             actualizarPanel();
         } else if (TIPO_DOCUMENTO_CAMBIADO.equals(evento)) {
-            builderActual = barraDeHerramientasBuilder.getTipoDocumento();
-            // Se necesita la integracion Builder: builderActual = crear ReporteEjecutivoBuilder / FacturaSimpleBuilder
+            tipoActual = barraDeHerramientasBuilder.getTipoDocumento();
+            builderActual = crearBuilder(tipoActual);
             actualizarPanel();
         } else if (EXPORTAR_SOLICITADO.equals(evento)) {
             exportar();
         }
+    }
+
+    private DocumentBuilder crearBuilder(String tipo) {
+        if (BarraDeHerramientasBuilder.REPORTE_EJECUTIVO.equals(tipo)) {
+            return new builder.ReporteEjecutivoBuilder();
+        }
+        if (BarraDeHerramientasBuilder.FACTURA_SIMPLE.equals(tipo)) {
+            return new builder.FacturaSimpleBuilder();
+        }
+        throw new IllegalArgumentException("Tipo de documento sin builder asociado: " + tipo);
     }
 
     private void actualizarPanel() {
@@ -44,12 +62,28 @@ public class PanelControlMediator implements DocumentEditorMediator {
     }
 
     private void exportar() {
-        // Se necesita la integracion: builder.build() -> cadena de procesadores -> documento.renderizar()
-        System.out.println("   [Mediator] Exportando con builder=" + builderActual + " y motor=" + motorActual);
+        documentoActual = construirDocumento();
+        System.out.println("   [Mediator] Exportando con builder=" + documentoActual.getTitulo() + " (" + documentoActual.cantidadElementos() + " elementos), motor=" + motorActual);
+        // Integracion Bridge
     }
 
-    public String getBuilderActual() {
+    private EstructuraDocumento construirDocumento() {
+        if (BarraDeHerramientasBuilder.REPORTE_EJECUTIVO.equals(tipoActual)) {
+            return director.construirReporteEjecutivo(builderActual);
+        }
+        return director.construirFacturaSimple(builderActual);
+    }
+
+    public DocumentBuilder getBuilderActual() {
         return builderActual;
+    }
+
+    public String getTipoActual() {
+        return tipoActual;
+    }
+
+    public EstructuraDocumento getDocumentoActual() {
+        return documentoActual;
     }
 
     public String getMotorActual() {
