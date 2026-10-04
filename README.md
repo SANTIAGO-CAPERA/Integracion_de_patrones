@@ -1,1 +1,1 @@
-# Integracion_de_patrone
+# Integracion_de_patrones
