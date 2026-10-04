@@ -13,9 +13,18 @@ import builder.EstructuraDocumento;
 import builder.FacturaSimpleBuilder;
 import builder.ReporteEjecutivoBuilder;
 import chain.DocumentoEnProceso;
+import chain.EvaluadorExpresiones;
+import chain.FiltroPalabrasProhibidas;
+import chain.ProcesadorHandler;
+import chain.ResultadoProceso;
+import chain.ValidadorSintaxis;
+import interpreter.Context;
+import java.util.Arrays;
+import java.util.List;
 
 public class PanelControlMediator implements DocumentEditorMediator {
     private static final int ELEMENTOS_POR_PAGINA = 2;
+    private static final List<String> PALABRAS_PROHIBIDAS = Arrays.asList("confidencial");
 
     private final SelectorDeFormato selectorDeFormato;
     private final BarraDeHerramientasBuilder barraDeHerramientasBuilder;
@@ -29,6 +38,8 @@ public class PanelControlMediator implements DocumentEditorMediator {
     private RenderizadorEngine motorActual;
     private Documento documentoActual;
     private String ultimaSalida;
+
+    private Context contexto = crearContextoPorDefecto();
 
     public PanelControlMediator(SelectorDeFormato selectorDeFormato, BarraDeHerramientasBuilder barraDeHerramientasBuilder, VistaPrevia vistaPrevia, BotonExportar botonExportar) {
         this.selectorDeFormato = selectorDeFormato;
@@ -44,6 +55,7 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     public void notificar(ComponenteUI emisor, String evento) {
         System.out.println("   [Mediator] " + emisor.getNombre() + " -> " + evento);
+
         if (FORMATO_CAMBIADO.equals(evento)) {
             motorActual = crearMotor(selectorDeFormato.getFormato());
             actualizarPanel();
@@ -87,8 +99,15 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     private void exportar() {
         EstructuraDocumento estructura = construirEstructura();
-        // Se necesita la integracion Chain: pasar el DocumentoEnProceso por la cadena de procesadores antes de renderizar.
         DocumentoEnProceso contenido = new DocumentoEnProceso(estructura);
+
+        ResultadoProceso resultado = crearCadena().procesar(contenido);
+        if (resultado.isErrorCritico()) {
+            documentoActual = null;
+            ultimaSalida = null;
+            System.out.println("   [Mediator] Exportacion cancelada: " + resultado.getMensaje());
+            return;
+        }
 
         documentoActual = crearDocumento(contenido);
         ultimaSalida = documentoActual.renderizar();
@@ -96,6 +115,21 @@ public class PanelControlMediator implements DocumentEditorMediator {
         System.out.println("   [Mediator] " + estructura.getTitulo() + " renderizado con " + motorActual.getNombre()
                 + " (" + documentoActual.getClass().getSimpleName() + "):");
         System.out.println(ultimaSalida);
+    }
+
+    private ProcesadorHandler crearCadena() {
+        ProcesadorHandler cadena = new ValidadorSintaxis();
+        cadena.setSiguiente(new FiltroPalabrasProhibidas(PALABRAS_PROHIBIDAS))
+              .setSiguiente(new EvaluadorExpresiones(contexto));
+        return cadena;
+    }
+
+    private static Context crearContextoPorDefecto() {
+        return new Context()
+                .define("INGRESOS", 1000)
+                .define("EGRESOS", 400)
+                .define("PRECIO_BASE", 1000)
+                .define("DESCUENTO", 50);
     }
 
     private EstructuraDocumento construirEstructura() {
@@ -126,6 +160,10 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     public Documento getDocumentoActual() {
         return documentoActual;
+    }
+
+    public void setContexto(Context contexto) {
+        this.contexto = contexto;
     }
 
     public String getUltimaSalida() {

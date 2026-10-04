@@ -1,5 +1,7 @@
 package mediator;
 
+import interpreter.Context;
+
 public class MediatorDemo {
 
     public static void main(String[] args) {
@@ -34,6 +36,11 @@ public class MediatorDemo {
         System.out.println("--- 6. Cambiar a reporte ejecutivo en Markdown y exportar ---");
         barra.seleccionarTipo(BarraDeHerramientasBuilder.REPORTE_EJECUTIVO);
         selector.seleccionarFormato(SelectorDeFormato.MARKDOWN);
+        boton.presionar();
+
+        System.out.println();
+        System.out.println("--- 7. Exportar con un contexto sin variables (la cadena se interrumpe) ---");
+        panel.setContexto(new Context());
         boton.presionar();
 
         System.out.println();
