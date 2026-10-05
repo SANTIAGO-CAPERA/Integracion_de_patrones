@@ -777,7 +777,7 @@ classDiagram
 
 
 
-Conclusión
+## Conclusión
 El proyecto demuestra cómo diferentes patrones de diseño pueden integrarse dentro de una misma aplicación para resolver problemas concretos de arquitectura y organización del código.
 El Mediator coordina el sistema, el Builder construye los documentos, Flyweight optimiza los objetos repetidos, Chain of Responsibility controla el procesamiento, Interpreter permite evaluar expresiones y Bridge permite cambiar el formato de salida sin modificar la estructura del documento.
 De esta manera, el motor puede construir y procesar documentos de forma modular, permitiendo incorporar nuevos tipos de documentos, expresiones, validaciones o formatos de salida sin tener que modificar completamente el sistema.
