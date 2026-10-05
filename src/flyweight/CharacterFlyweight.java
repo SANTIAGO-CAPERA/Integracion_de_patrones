@@ -10,10 +10,13 @@ public class CharacterFlyweight implements GlyphFlyweight {
         this.fontName = fontName;
     }
 
+    @Override
     public String draw(int x, int y, String color, int scale) {
-        return "Character '" + symbol + "' | font=" + fontName + " | x=" + x + " y=" + y + " | color=" + color + " | scale=" + scale;
+        return "Character '" + symbol + "' | font=" + fontName
+                + " | x=" + x + " y=" + y + " | color=" + color + " | scale=" + scale;
     }
 
+    @Override
     public String getContent() {
         return String.valueOf(symbol);
     }
