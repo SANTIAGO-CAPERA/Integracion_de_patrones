@@ -1,6 +1,6 @@
 package mediator;
 
-public class ComponenteUI {
+public abstract class ComponenteUI {
     
     protected DocumentEditorMediator mediator;
     private final String nombre;

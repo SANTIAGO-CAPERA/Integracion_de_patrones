@@ -1,5 +1,6 @@
 package mediator;
-import mediator.SelectorDeFormato;
+
+import interpreter.Context;
 
 public class MediatorDemo {
 
@@ -20,7 +21,7 @@ public class MediatorDemo {
 
         System.out.println();
         System.out.println("--- 3. Elegir formato PDF ---");
-        selector.seleccionar(SelectorDeFormato.PDF);
+        selector.seleccionarFormato(SelectorDeFormato.PDF);
 
         System.out.println();
         System.out.println("--- 4. Exportar ---");
@@ -28,11 +29,22 @@ public class MediatorDemo {
 
         System.out.println();
         System.out.println("--- 5. Cambiar formato a HTML y exportar ---");
-        selector.seleccionar(SelectorDeFormato.HTML);
+        selector.seleccionarFormato(SelectorDeFormato.HTML);
         boton.presionar();
 
         System.out.println();
-        System.out.println("Builder final: " + panel.getBuilderActual());
-        System.out.println("Motor final: " + panel.getMotorActual());
+        System.out.println("--- 6. Cambiar a reporte ejecutivo en Markdown y exportar ---");
+        barra.seleccionarTipo(BarraDeHerramientasBuilder.REPORTE_EJECUTIVO);
+        selector.seleccionarFormato(SelectorDeFormato.MARKDOWN);
+        boton.presionar();
+
+        System.out.println();
+        System.out.println("--- 7. Exportar con un contexto sin variables (la cadena se interrumpe) ---");
+        panel.setContexto(new Context());
+        boton.presionar();
+
+        System.out.println();
+        System.out.println("Tipo de documento final: " + panel.getTipoActual());
+        System.out.println("Motor final: " + panel.getMotorActual().getNombre());
     }
 }
