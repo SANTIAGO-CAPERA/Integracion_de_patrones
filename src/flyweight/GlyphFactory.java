@@ -1,37 +1,24 @@
 package flyweight;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class GlyphFactory {
 
-    private final HashMap<String, GlyphFlyweight> pool;
-    private int totalRequests;
-
-    public GlyphFactory() {
-        this.pool = new HashMap<String, GlyphFlyweight>();
-        this.totalRequests = 0;
-    }
+    private final Map<String, GlyphFlyweight> pool = new HashMap<>();
+    private int totalRequests = 0;
 
     public GlyphFlyweight getCharacter(char symbol, String fontName) {
         totalRequests++;
         String key = "C:" + fontName + ":" + symbol;
-        GlyphFlyweight glyph = pool.get(key);
-        if (glyph == null) {
-            glyph = new CharacterFlyweight(symbol, fontName);
-            pool.put(key, glyph);
-        }
-        return glyph;
+        return pool.computeIfAbsent(key, k -> new CharacterFlyweight(symbol, fontName));
     }
 
     public GlyphFlyweight getIcon(String iconName, String imagePath) {
         totalRequests++;
-        String key = "I:" + iconName;
-        GlyphFlyweight glyph = pool.get(key);
-        if (glyph == null) {
-            glyph = new IconFlyweight(iconName, imagePath);
-            pool.put(key, glyph);
-        }
-        return glyph;
+        // La llave incluye nombre y ruta (todo el estado intrinseco)
+        String key = "I:" + iconName + ":" + imagePath;
+        return pool.computeIfAbsent(key, k -> new IconFlyweight(iconName, imagePath));
     }
 
     public int getPoolSize() {
@@ -40,5 +27,10 @@ public class GlyphFactory {
 
     public int getTotalRequests() {
         return totalRequests;
+    }
+
+
+    public int getReusedCount() {
+        return totalRequests - pool.size();
     }
 }

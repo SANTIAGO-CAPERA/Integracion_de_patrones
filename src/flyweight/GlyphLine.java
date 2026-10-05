@@ -1,24 +1,26 @@
 package flyweight;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GlyphLine {
 
+    private static final int CHAR_WIDTH = 8;
+
     private final GlyphFactory factory;
-    private final ArrayList<PlacedGlyph> glyphs;
+    private final List<PlacedGlyph> glyphs = new ArrayList<>();
 
     public GlyphLine(GlyphFactory factory) {
         this.factory = factory;
-        this.glyphs = new ArrayList<PlacedGlyph>();
     }
 
     public void addText(String text, String fontName, int startX, int y, String color, int scale) {
         int x = startX;
         for (int i = 0; i < text.length(); i++) {
-            char symbol = text.charAt(i);
-            GlyphFlyweight flyweight = factory.getCharacter(symbol, fontName);
+            GlyphFlyweight flyweight = factory.getCharacter(text.charAt(i), fontName);
             glyphs.add(new PlacedGlyph(flyweight, x, y, color, scale));
-            x = x + 8 * scale;
+            x += CHAR_WIDTH * scale;
         }
     }
 
@@ -28,15 +30,15 @@ public class GlyphLine {
     }
 
     public String getPlainText() {
-        String result = "";
-        for (int i = 0; i < glyphs.size(); i++) {
-            result = result + glyphs.get(i).getContent();
+        StringBuilder sb = new StringBuilder();
+        for (PlacedGlyph g : glyphs) {
+            sb.append(g.getContent());
         }
-        return result;
+        return sb.toString();
     }
 
-    public ArrayList<PlacedGlyph> getGlyphs() {
-        return glyphs;
+    public List<PlacedGlyph> getGlyphs() {
+        return Collections.unmodifiableList(glyphs);
     }
 
     public int size() {
