@@ -1,5 +1,6 @@
 package flyweight;
 
+
 public class PlacedGlyph {
 
     private final GlyphFlyweight glyph;
