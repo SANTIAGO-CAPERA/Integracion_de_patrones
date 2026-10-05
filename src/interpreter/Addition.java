@@ -1,6 +1,6 @@
 package interpreter;
 
-public class Addition extends ExpresionNoTerminal {
+public class Addition extends NonTerminalExpression {
 
     public Addition(Expression left, Expression right) {
         super(left, right);

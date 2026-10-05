@@ -1,6 +1,6 @@
 package interpreter;
 
-public class Variable extends ExpresionTerminal {
+public class Variable extends TerminalExpression {
 
     private final String name;
 
