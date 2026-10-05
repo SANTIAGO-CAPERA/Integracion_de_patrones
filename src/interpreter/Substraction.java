@@ -1,7 +1,6 @@
 package interpreter;
 
-
-public class Substraction extends NonTerminalExpression {
+public class Substraction extends ExpresionNoTerminal {
 
     public Substraction(Expression left, Expression right) {
         super(left, right);

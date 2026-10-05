@@ -2,7 +2,6 @@ package chain;
 
 import java.util.List;
 
-
 public class FiltroPalabrasProhibidas extends ProcesadorHandler {
 
     private List<String> prohibidas;
@@ -19,7 +18,7 @@ public class FiltroPalabrasProhibidas extends ProcesadorHandler {
             for (String palabra : prohibidas) {
                 texto = texto.replaceAll("(?i)" + palabra, "***");
             }
-            
+
             texto = texto.replaceAll("\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b", "[DATO OCULTO]");
 
             doc.setContenido(i, texto);
@@ -27,4 +26,3 @@ public class FiltroPalabrasProhibidas extends ProcesadorHandler {
         return ResultadoProceso.ok("texto sanitizado");
     }
 }
-

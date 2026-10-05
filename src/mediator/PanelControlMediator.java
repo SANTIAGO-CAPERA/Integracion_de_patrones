@@ -18,6 +18,7 @@ import chain.FiltroPalabrasProhibidas;
 import chain.ProcesadorHandler;
 import chain.ResultadoProceso;
 import chain.ValidadorSintaxis;
+import flyweight.GlyphFactory;
 import interpreter.Context;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,7 @@ public class PanelControlMediator implements DocumentEditorMediator {
     private final BotonExportar botonExportar;
 
     private final DirectorDocumento director = new DirectorDocumento();
+    private final GlyphFactory fabrica = new GlyphFactory();
     private DocumentBuilder builderActual;
     private String tipoActual;
 
@@ -70,10 +72,10 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     private DocumentBuilder crearBuilder(String tipo) {
         if (BarraDeHerramientasBuilder.REPORTE_EJECUTIVO.equals(tipo)) {
-            return new ReporteEjecutivoBuilder();
+            return new ReporteEjecutivoBuilder(fabrica);
         }
         if (BarraDeHerramientasBuilder.FACTURA_SIMPLE.equals(tipo)) {
-            return new FacturaSimpleBuilder();
+            return new FacturaSimpleBuilder(fabrica);
         }
         throw new IllegalArgumentException("Tipo de documento sin builder asociado: " + tipo);
     }
@@ -115,6 +117,9 @@ public class PanelControlMediator implements DocumentEditorMediator {
         System.out.println("   [Mediator] " + estructura.getTitulo() + " renderizado con " + motorActual.getNombre()
                 + " (" + documentoActual.getClass().getSimpleName() + "):");
         System.out.println(ultimaSalida);
+        System.out.println("   [Mediator] Flyweight: " + contenido.totalGlifos() + " glifos colocados en el documento, "
+                + fabrica.getPoolSize() + " objetos compartidos en el pool, "
+                + fabrica.getTotalRequests() + " solicitudes acumuladas");
     }
 
     private ProcesadorHandler crearCadena() {
@@ -164,6 +169,10 @@ public class PanelControlMediator implements DocumentEditorMediator {
 
     public void setContexto(Context contexto) {
         this.contexto = contexto;
+    }
+
+    public GlyphFactory getFabrica() {
+        return fabrica;
     }
 
     public String getUltimaSalida() {

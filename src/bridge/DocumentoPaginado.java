@@ -32,3 +32,4 @@ public class DocumentoPaginado extends Documento {
         return sb.toString();
     }
 }
+

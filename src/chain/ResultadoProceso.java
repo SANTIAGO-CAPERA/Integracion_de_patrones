@@ -1,6 +1,5 @@
 package chain;
 
-
 public class ResultadoProceso {
 
     private boolean exito;

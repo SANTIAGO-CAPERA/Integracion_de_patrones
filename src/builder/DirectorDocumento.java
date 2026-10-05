@@ -13,6 +13,8 @@ public class DirectorDocumento {
         return builder
                 .addHeader("Resumen financiero trimestral")
                 .addParagraph("Este reporte presenta los resultados del periodo.")
+                .addParagraph("Fecha de emision: #{FECHA_ACTUAL}")
+                .addParagraph("Pago con tarjeta 1234-5678-9012-3456 en documento confidencial")
                 .addTable(columnas, filas)
                 .addParagraph("Utilidad estimada: #{INGRESOS - EGRESOS}")
                 .addFooter("Area de finanzas")

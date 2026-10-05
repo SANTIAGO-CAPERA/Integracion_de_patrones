@@ -6,13 +6,11 @@ import interpreter.ExpressionParser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class EvaluadorExpresiones extends ProcesadorHandler {
 
     private static final Pattern MARCADOR = Pattern.compile("#\\{([^}]*)}");
 
     private Context context;
-
 
     public EvaluadorExpresiones(Context context) {
         this.context = context;
@@ -33,7 +31,7 @@ public class EvaluadorExpresiones extends ProcesadorHandler {
                     Object valor = e.interpret(context);
                     m.appendReplacement(sb, Matcher.quoteReplacement(String.valueOf(valor)));
                 } catch (IllegalArgumentException ex) {
-                    // formula mala o variable que no existe: se corta la cadena
+
                     return ResultadoProceso.critico("error en #{" + formula + "}: " + ex.getMessage());
                 }
                 cantidad++;

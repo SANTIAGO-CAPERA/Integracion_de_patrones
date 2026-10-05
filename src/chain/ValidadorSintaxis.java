@@ -5,7 +5,6 @@ import java.util.Deque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class ValidadorSintaxis extends ProcesadorHandler {
 
     private static final Pattern ETIQUETA = Pattern.compile("<(/?)([a-zA-Z][a-zA-Z0-9]*)>");
@@ -49,4 +48,3 @@ public class ValidadorSintaxis extends ProcesadorHandler {
         return null;
     }
 }
-

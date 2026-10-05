@@ -2,8 +2,7 @@ package interpreter;
 
 import java.math.BigDecimal;
 
-
-public class Number extends TerminalExpression {
+public class Number extends ExpresionTerminal {
 
     private final BigDecimal value;
 

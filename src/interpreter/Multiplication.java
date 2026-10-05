@@ -1,7 +1,6 @@
 package interpreter;
 
-
-public class Multiplication extends NonTerminalExpression {
+public class Multiplication extends ExpresionNoTerminal {
 
     public Multiplication(Expression left, Expression right) {
         super(left, right);

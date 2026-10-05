@@ -1,10 +1,15 @@
 package builder;
 
+import flyweight.GlyphFactory;
+import flyweight.GlyphLine;
+
 public class Encabezado implements ElementoDocumento {
     private final String texto;
+    private final GlyphLine linea;
 
-    public Encabezado(String texto) {
+    public Encabezado(String texto, GlyphFactory fabrica, int fila) {
         this.texto = texto;
+        this.linea = FabricaLineas.crear(fabrica, "ENCABEZADO", texto, fila);
     }
 
     @Override
@@ -15,5 +20,10 @@ public class Encabezado implements ElementoDocumento {
     @Override
     public String getContenido() {
         return texto;
+    }
+
+    @Override
+    public GlyphLine getLinea() {
+        return linea;
     }
 }
